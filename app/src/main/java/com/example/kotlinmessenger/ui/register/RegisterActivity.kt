@@ -4,12 +4,12 @@ import android.app.Activity
 import android.content.ContentValues.TAG
 import android.content.Intent
 import android.net.Uri
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import com.example.kotlinmessenger.MainActivity
 import com.example.kotlinmessenger.R
@@ -23,6 +23,7 @@ import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_register.*
 import java.util.*
 
+
 class RegisterActivity : AppCompatActivity() {
     private lateinit var binding: ActivityRegisterBinding
     private var selectedPhotoUri: Uri? = null
@@ -33,7 +34,15 @@ class RegisterActivity : AppCompatActivity() {
 
 
         register_button_register.setOnClickListener {
-            performRegistration()
+//            performRegistration()
+
+            val database = FirebaseDatabase.getInstance()
+            val myRef = database.getReference("message")
+
+            myRef.setValue("Hello, World!")
+
+
+            Toast.makeText(this, "write data", Toast.LENGTH_SHORT).show()
         }
 
         already_have_account_text_view.setOnClickListener {
@@ -94,11 +103,15 @@ class RegisterActivity : AppCompatActivity() {
                 if (!it.isSuccessful) return@addOnCompleteListener
 
                 // else if successful
-                Log.d(TAG, "Successfully created user with uid: ${it.result!!.user?.uid}")
-                uploadImageToFirebaseStorage()
+                loading_view.visibility = View.GONE
+                already_have_account_text_view.visibility = View.VISIBLE
+
+                Log.d("TAG", "Successfully created user with uid: ${it.result!!.user?.uid}")
+
+
             }
             .addOnFailureListener {
-                Log.d(TAG, "Failed to create user: ${it.message}")
+                Log.d("TAG", "Failed to create user: ${it.message}")
                 loading_view.visibility = View.GONE
                 already_have_account_text_view.visibility = View.VISIBLE
                 Toast.makeText(this, "${it.message}", Toast.LENGTH_LONG).show()
